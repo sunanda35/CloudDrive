@@ -1,9 +1,18 @@
 const Files = require("../Models/file.model");
 const createHttpError = require("http-errors");
+const multer = require("multer");
+
+const storage = multer.memoryStorage({
+  destination: (req, file, callback) => {
+    callback(null, "");
+  },
+});
 
 module.exports = {
   addFile: async (req, res, next) => {
     try {
+      const upload = multer({ storage: storage });
+
       res.send("add file");
     } catch (err) {
       next(err);

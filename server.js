@@ -7,29 +7,31 @@ var cookieParser = require("cookie-parser");
 const authRoute = require("./src/Routes/auth.route");
 const fileRouter = require("./src/Routes/file.route");
 require("dotenv").config();
+const cors = require("cors");
 require("./src/Helpers/init_mongodb");
 const { verifyAccessToken } = require("./src/Helpers/jwt_helper");
 
 const app = express();
+app.use(cors()); //to avoid cors error
 const PORT = process.env.PORT || 8080;
-const numOfCpus = cpus().length;
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+const numOfCpus = cpus().length; //to count the cpu threads
+app.use(express.json()); //json body data take
+app.use(express.urlencoded({ extended: true })); //url prams data take
+app.use(cookieParser()); //to read cookies
 
-app.get("/", verifyAccessToken, async (req, res) => {
-  res.send({
-    message: "hi, How are you fucker!",
-    data: {
-      name: req.payload.name,
-      email: req.payload.email,
-      payload: req.payload,
-    },
-  });
-});
+// app.get("/", verifyAccessToken, async (req, res) => {
+//   res.send({
+//     message: "hi, How are you fucker!",
+//     data: {
+//       name: req.payload.name,
+//       email: req.payload.email,
+//       payload: req.payload,
+//     },
+//   }); //just a normal home api
+// });
 
-app.use("/auth", authRoute);
-app.use("/file", verifyAccessToken, fileRouter);
+app.use("/api/auth", authRoute); //authentication api router
+app.use("/api/file", verifyAccessToken, fileRouter); //file cred operation router
 
 app.use(async (req, res, next) => {
   next(createHttpError.NotFound("Sorry! This route is not available."));
