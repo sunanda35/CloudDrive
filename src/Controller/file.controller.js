@@ -1,5 +1,6 @@
 const Files = require("../Models/file.model");
 const createHttpError = require("http-errors");
+const cloudinary = require("../Helpers/cloudinary");
 const multer = require("multer");
 
 const storage = multer.memoryStorage({
@@ -11,10 +12,17 @@ const storage = multer.memoryStorage({
 module.exports = {
   addFile: async (req, res, next) => {
     try {
-      const upload = multer({ storage: storage });
+      const imageToUpload = req.body.image;
 
-      res.send("add file");
+      const uploadImage = await cloudinary.uploader.upload(imageToUpload, {
+        upload_preset: "ml_default",
+        public_id: `${Date.now()}`,
+        resource_type: "auto",
+      });
+      console.log(uploadImage);
+      res.send({ uploadImage });
     } catch (err) {
+      console.log(err);
       next(err);
     }
   },
