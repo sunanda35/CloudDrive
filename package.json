@@ -4,7 +4,7 @@
   "description": "It's a cloud storage application like google drive",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "cd client && ng serve",
     "client": "cd client && ng serve",
     "dev": "nodemon server.js",
     "both": "concurrently -n 'server,client' -c 'red,green' \"npm run dev\" \"npm run client\""
