@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "client": "npm start --prefix client",
+    "client": "cd client && ng serve",
     "dev": "nodemon server.js",
     "both": "concurrently -n 'server,client' -c 'red,green' \"npm run dev\" \"npm run client\""
   },
