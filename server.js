@@ -13,6 +13,7 @@ const { verifyAccessToken } = require("./src/Helpers/jwt_helper");
 
 const app = express();
 app.use(cors()); //to avoid cors error
+
 const PORT = process.env.PORT || 8080;
 const numOfCpus = cpus().length; //to count the cpu threads
 app.use(express.json()); //json body data take
