@@ -1,42 +1,46 @@
 const FileModel = require("../Models/file.model");
 const createHttpError = require("http-errors");
-const cloudinary = require("../Helpers/cloudinary");
+const cloudinary = require("../Config/cloudinary");
+const uploadController = require("./UploadController/upload.controller");
+const deleteController = require("./DeleteController/deleteController");
 const fs = require("fs");
 
 module.exports = {
-  addFile: async (req, res, next) => {
+  uploadFile: async (req, res, next) => {
     try {
-      const imageToUpload = req.file;
-      const uploadImage = await cloudinary.uploader.upload(
-        imageToUpload.path,
-        {
-          folder: "cloud_drive",
-        },
-        (err, result) => {
-          fs.unlinkSync(imageToUpload.path);
-          if (err) return next(err);
-          // console.log(result);
-        }
-      );
-      const uploadData = new FileModel({
-        file_name: imageToUpload.originalname,
-        file_type: imageToUpload.mimetype,
-        file_size: imageToUpload.size,
-        file_id: uploadImage.public_id,
-        format: uploadImage.format,
-        url: uploadImage.secure_url,
-      });
-      const saveData = await uploadData.save();
-      res.status(200).send({
-        status: 200,
-        message: "File Uploaded Successfully!",
-        data: saveData,
-      });
+      const storageBox = req.params.cloud;
+      const dataFile = req.file;
+      switch (storageBox) {
+        case "cloudinary":
+          const cloudinary = await uploadController.cloudinary(dataFile);
+          res.status(200).send(cloudinary);
+          break;
+        case "oneDrive":
+          const oneDrive = await uploadController.oneDrive(dataFile);
+          res.status(200).send(oneDrive);
+          break;
+        case "gDrive":
+          const gDrive = await uploadController.gDrive(dataFile);
+          res.status(200).send(gDrive);
+          break;
+        case "dropBox":
+          const dropBox = await uploadController.dropBox(dataFile);
+          res.status(200).send(dropBox);
+          break;
+        case "s3":
+          const s3 = await uploadController.s3(dataFile);
+          res.status(200).send(s3);
+          break;
+        default:
+          next(
+            createHttpError.NotFound("No Drive found with this name. Sorry!")
+          );
+      }
     } catch (err) {
       next(err);
     }
   },
-  getAllFile: async (req, res, next) => {
+  fetchAllFile: async (req, res, next) => {
     try {
       const allFiles = await FileModel.find({});
       if (allFiles.length === 0)
@@ -64,7 +68,33 @@ module.exports = {
   deleteOneFile: async (req, res, next) => {
     try {
       const file_id = req.params.id;
-      const deleteFile = await FileModel.findByIdAndDelete(file_id);
+      const storageBox = req.params.storage;
+      switch (storageBox) {
+        case "cloudinary":
+          const deleteFile = await deleteController.deleteCloudinary(file_id);
+          res.status(deleteFile.status).send(deleteFile);
+          break;
+        case "oneDrive":
+          const oneDrive = await deleteController.oneDrive(dataFile);
+          res.status(200).send(oneDrive);
+          break;
+        case "gDrive":
+          const gDrive = await deleteController.gDrive(dataFile);
+          res.status(200).send(gDrive);
+          break;
+        case "dropBox":
+          const dropBox = await deleteController.dropBox(dataFile);
+          res.status(200).send(dropBox);
+          break;
+        case "s3":
+          const s3 = await deleteController.s3(dataFile);
+          res.status(200).send(s3);
+          break;
+        default:
+          next(
+            createHttpError.NotFound("No Drive found with this name. Sorry!")
+          );
+      }
       res.status(200).send({
         status: 200,
         message: "File Deleted Successfully!",

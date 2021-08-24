@@ -12,6 +12,7 @@ mongoose
   .catch((err) => {
     console.log(err.message);
   });
+
 mongoose.connection.on("connected", () => {
   console.log("Mongodb connected to database");
 });

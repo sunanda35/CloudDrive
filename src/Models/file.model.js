@@ -1,11 +1,15 @@
 const mongoose = require("mongoose");
 const FileSchema = new mongoose.Schema(
   {
-    file_name: {
+    name: {
       type: String,
       required: true,
     },
     file_type: {
+      type: String,
+      required: true,
+    },
+    storage_drive: {
       type: String,
       required: true,
     },

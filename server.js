@@ -8,7 +8,7 @@ const authRoute = require("./src/Routes/auth.route");
 const fileRouter = require("./src/Routes/file.route");
 require("dotenv").config();
 const cors = require("cors");
-require("./src/Helpers/init_mongodb");
+require("./src/Config/init_mongodb");
 const { verifyAccessToken } = require("./src/Helpers/jwt_helper");
 
 const app = express();
@@ -37,6 +37,7 @@ app.use("/api/file", verifyAccessToken, fileRouter); //file cred operation route
 app.use(async (req, res, next) => {
   next(createHttpError.NotFound("Sorry! This route is not available."));
 });
+
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.send({
